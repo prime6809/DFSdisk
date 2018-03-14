@@ -64,3 +64,13 @@ __recovery/
 
 # Castalia statistics file (since XE7 Castalia is distributed with Delphi)
 *.stat
+
+# Lazarus files to be ignored
+*.compiled
+*.ppu
+*.bak
+
+#Ignore disk images
+*.ssd
+*.hfe
+

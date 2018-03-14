@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="10"/>
+    <BuildModes Active="Default"/>
+    <Units Count="11">
+      <Unit0>
+        <Filename Value="DFSDisk.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <TopLine Value="413"/>
+        <CursorPos X="17" Y="451"/>
+        <UsageCount Value="111"/>
+        <Loaded Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="ConsoleUtils.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="83"/>
+        <UsageCount Value="111"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="dfsdiskunit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DFSDiskUnit"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="393"/>
+        <CursorPos X="39" Y="348"/>
+        <UsageCount Value="109"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="dfsutilunit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DFSUtilUnit"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="10" Y="18"/>
+        <UsageCount Value="107"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="D:\apps\lazarus\fpc\3.0.2\source\packages\fcl-base\src\custapp.pp"/>
+        <UnitName Value="CustApp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="505"/>
+        <CursorPos X="41" Y="545"/>
+        <UsageCount Value="2"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="C:\lazarus\fpc\2.6.4\source\packages\fcl-base\src\custapp.pp"/>
+        <UnitName Value="CustApp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="44"/>
+        <CursorPos X="14" Y="62"/>
+        <UsageCount Value="2"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="C:\lazarus\fpc\3.0.4\source\packages\fcl-base\src\custapp.pp"/>
+        <UnitName Value="CustApp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="570"/>
+        <CursorPos X="26" Y="598"/>
+        <UsageCount Value="8"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\objpas\classes\classesh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="952"/>
+        <CursorPos X="15" Y="971"/>
+        <UsageCount Value="4"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="D:\apps\lazarus\fpc\3.0.2\source\rtl\objpas\classes\classesh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="915"/>
+        <CursorPos X="3" Y="931"/>
+        <UsageCount Value="3"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="..\..\..\SRC\Delphi7\DirectDisk\BeebDFSDisk\RamothDialogsUnit.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="40"/>
+        <UsageCount Value="5"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="..\..\..\SRC\Delphi7\DebugServer\DebugInclude.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="583"/>
+        <CursorPos Y="580"/>
+        <UsageCount Value="6"/>
+      </Unit10>
+    </Units>
+    <JumpHistory HistoryIndex="-1"/>
+  </ProjectSession>
+</CONFIG>
