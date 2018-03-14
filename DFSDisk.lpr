@@ -212,7 +212,7 @@ BEGIN;
   FINALLY
     InStream.Free;
   END;
-END;      https://github.com/prime6809/hello-world.git
+END;
 
 PROCEDURE TDFSDisk.DoCat;
 

@@ -8,8 +8,9 @@
       <Unit0>
         <Filename Value="DFSDisk.lpr"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="413"/>
-        <CursorPos X="17" Y="451"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="206"/>
+        <CursorPos Y="216"/>
         <UsageCount Value="111"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -24,7 +25,6 @@
         <Filename Value="dfsdiskunit.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DFSDiskUnit"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="393"/>
         <CursorPos X="39" Y="348"/>
@@ -78,19 +78,24 @@
         <UsageCount Value="3"/>
       </Unit8>
       <Unit9>
-        <Filename Value="..\..\..\SRC\Delphi7\DirectDisk\BeebDFSDisk\RamothDialogsUnit.pas"/>
+        <Filename Value="D:\SRC\Delphi7\DirectDisk\BeebDFSDisk\RamothDialogsUnit.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="40"/>
         <UsageCount Value="5"/>
       </Unit9>
       <Unit10>
-        <Filename Value="..\..\..\SRC\Delphi7\DebugServer\DebugInclude.pas"/>
+        <Filename Value="D:\SRC\Delphi7\DebugServer\DebugInclude.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="583"/>
         <CursorPos Y="580"/>
         <UsageCount Value="6"/>
       </Unit10>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="dfsdiskunit.pas"/>
+        <Caret Line="348" Column="39" TopLine="393"/>
+      </Position1>
+    </JumpHistory>
   </ProjectSession>
 </CONFIG>
