@@ -4,13 +4,14 @@
     <PathDelim Value="\"/>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="11">
+    <Units Count="13">
       <Unit0>
         <Filename Value="DFSDisk.lpr"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="413"/>
-        <CursorPos X="17" Y="451"/>
-        <UsageCount Value="111"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="145"/>
+        <CursorPos X="126" Y="161"/>
+        <UsageCount Value="122"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -18,17 +19,16 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos Y="83"/>
-        <UsageCount Value="111"/>
+        <UsageCount Value="122"/>
       </Unit1>
       <Unit2>
         <Filename Value="dfsdiskunit.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DFSDiskUnit"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="393"/>
-        <CursorPos X="39" Y="348"/>
-        <UsageCount Value="109"/>
+        <TopLine Value="117"/>
+        <CursorPos X="16" Y="136"/>
+        <UsageCount Value="120"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
@@ -37,15 +37,15 @@
         <UnitName Value="DFSUtilUnit"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="10" Y="18"/>
-        <UsageCount Value="107"/>
+        <UsageCount Value="118"/>
       </Unit3>
       <Unit4>
         <Filename Value="D:\apps\lazarus\fpc\3.0.2\source\packages\fcl-base\src\custapp.pp"/>
         <UnitName Value="CustApp"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="505"/>
-        <CursorPos X="41" Y="545"/>
-        <UsageCount Value="2"/>
+        <TopLine Value="71"/>
+        <CursorPos X="14" Y="88"/>
+        <UsageCount Value="9"/>
       </Unit4>
       <Unit5>
         <Filename Value="C:\lazarus\fpc\2.6.4\source\packages\fcl-base\src\custapp.pp"/>
@@ -53,7 +53,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="44"/>
         <CursorPos X="14" Y="62"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit5>
       <Unit6>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\packages\fcl-base\src\custapp.pp"/>
@@ -61,36 +61,140 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="570"/>
         <CursorPos X="26" Y="598"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit6>
       <Unit7>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\objpas\classes\classesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="952"/>
         <CursorPos X="15" Y="971"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="3"/>
       </Unit7>
       <Unit8>
         <Filename Value="D:\apps\lazarus\fpc\3.0.2\source\rtl\objpas\classes\classesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="915"/>
         <CursorPos X="3" Y="931"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit8>
       <Unit9>
         <Filename Value="..\..\..\SRC\Delphi7\DirectDisk\BeebDFSDisk\RamothDialogsUnit.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="40"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="4"/>
       </Unit9>
       <Unit10>
         <Filename Value="..\..\..\SRC\Delphi7\DebugServer\DebugInclude.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="583"/>
         <CursorPos Y="580"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="5"/>
       </Unit10>
+      <Unit11>
+        <Filename Value="D:\apps\lazarus\fpc\3.0.2\source\rtl\inc\getopts.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="479"/>
+        <CursorPos X="48" Y="12"/>
+        <UsageCount Value="9"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="D:\apps\lazarus\fpc\3.0.4\source\packages\fcl-base\src\custapp.pp"/>
+        <UnitName Value="CustApp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="61"/>
+        <CursorPos X="27" Y="81"/>
+        <UsageCount Value="10"/>
+      </Unit12>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="22" HistoryIndex="21">
+      <Position1>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="299" TopLine="276"/>
+      </Position1>
+      <Position2>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="300" TopLine="276"/>
+      </Position2>
+      <Position3>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="301" TopLine="276"/>
+      </Position3>
+      <Position4>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="303" TopLine="276"/>
+      </Position4>
+      <Position5>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="305" TopLine="276"/>
+      </Position5>
+      <Position6>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="380" TopLine="362"/>
+      </Position6>
+      <Position7>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="384" TopLine="362"/>
+      </Position7>
+      <Position8>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="388" TopLine="362"/>
+      </Position8>
+      <Position9>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="392" TopLine="362"/>
+      </Position9>
+      <Position10>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="119" Column="43" TopLine="82"/>
+      </Position10>
+      <Position11>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="101" Column="46" TopLine="85"/>
+      </Position11>
+      <Position12>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="328" TopLine="319"/>
+      </Position12>
+      <Position13>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="339" TopLine="319"/>
+      </Position13>
+      <Position14>
+        <Filename Value="dfsdiskunit.pas"/>
+        <Caret Line="136" Column="16" TopLine="117"/>
+      </Position14>
+      <Position15>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="338" TopLine="319"/>
+      </Position15>
+      <Position16>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="338" TopLine="319"/>
+      </Position16>
+      <Position17>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="338" TopLine="319"/>
+      </Position17>
+      <Position18>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="128" Column="52" TopLine="96"/>
+      </Position18>
+      <Position19>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="119" Column="5" TopLine="97"/>
+      </Position19>
+      <Position20>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="120" Column="11" TopLine="102"/>
+      </Position20>
+      <Position21>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="335" Column="41" TopLine="322"/>
+      </Position21>
+      <Position22>
+        <Filename Value="DFSDisk.lpr"/>
+        <Caret Line="118" Column="3" TopLine="82"/>
+      </Position22>
+    </JumpHistory>
   </ProjectSession>
 </CONFIG>

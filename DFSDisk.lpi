@@ -25,7 +25,7 @@
     <RunParams>
       <local>
         <FormatVersion Value="1"/>
-        <CommandLineParams Value="delete test.ssd -d FORM80 -q $20"/>
+        <CommandLineParams Value="create test.ssd --tracks=80"/>
       </local>
     </RunParams>
     <Units Count="4">

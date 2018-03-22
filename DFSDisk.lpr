@@ -98,14 +98,14 @@ CONST
                            OptSDFSName+ ':'+
                            OptSExec+    ':'+
                            OptSFile+    ':'+
-                           OptSHelp+
+                           OptSHelp+    '::'+
                            OptSLoad+    ':'+
                            OptSLabel+   ':'+
                            OptSOpt+     ':'+
                            OptSQual+    ':'+
                            OptSTracks+  ':';
 
-    LongOpts    : string = OptLFCount+  ': '+
+(*    LongOpts    : string = OptLFCount+  ': '+
                            OptLDFSName+ ': '+
                            OptLExec+    ': '+
                            OptLFile+    ': '+
@@ -115,6 +115,18 @@ CONST
                            OptLOpt+     ': '+
                            OptLQual+    ': '+
                            OptLTracks+  ': ';
+*)
+    LongOptsArray : array[1..10] of string =
+                                      (OptLFCount+':',
+                                       OptLDFSName+':',
+                                       OptLExec+':',
+                                       OptLFile+':',
+                                       OptLHelp,
+                                       OptLLoad+':',
+                                       OptLLabel+':',
+                                       OptLOpt+':',
+                                       OptLQual+':',
+                                       OptLTracks+':');
 
     {Valid operations}
     CmdCreate   = 'create';                     // Create a new disk image
@@ -146,7 +158,7 @@ BEGIN;
   IF (Disk.CreateImage(DFSTracks,DFSQual,DFSLabel,DFSOption)) THEN
     Disk.SaveToFile(DFSImageName);
 
-  WriteLnFmt('Created image file %s, title %s, qual %s, opt %d',[DFSImageName,DFSLabel,DFSQual,DFSOption]);
+  WriteLnFmt('Created image file %s, title %s, qual %s, opt %d, tracks=%d',[DFSImageName,DFSLabel,DFSQual,DFSOption,DFSTracks]);
 END;
 
 PROCEDURE TDFSDisk.DoRead;
@@ -212,7 +224,7 @@ BEGIN;
   FINALLY
     InStream.Free;
   END;
-END;      https://github.com/prime6809/hello-world.git
+END;
 
 PROCEDURE TDFSDisk.DoCat;
 
@@ -323,15 +335,19 @@ var
 
 begin
   // quick check parameters
-  ErrorMsg:=CheckOptions(ShortOpts, LongOpts);
+  ErrorMsg:=CheckOptions(ShortOpts, LongOptsArray);
 
   // parse parameters
   if HasOption(OptSHelp, OptLHelp) then
+  begin;
     DoHelp;
+//    Terminate;
+    Exit;
+  end;
 
   { add your program here }
   { Get parameters that are not options}
-  GetNonOptions(ShortOpts, LongOpts, CmdParams);
+  GetNonOptions(ShortOpts, LongOptsArray, CmdParams);
 
   {Get command and DFS disk name}
   IF (CmdParams.Count > 1) THEN
@@ -398,6 +414,7 @@ begin
   {If we have errors, display them and terminate}
   if ErrorMsg<>'' then
   begin
+    ErrorMsg:=ErrorMsg+'use -h or --help for help';
     ShowException(Exception.Create(ErrorMsg));
     Terminate;
     Exit;
@@ -437,7 +454,26 @@ end;
 procedure TDFSDisk.WriteHelp;
 begin
   { add your help code here }
-  WriteLnFmt('%s <operation> <DFSImage> [<DFSFileName>] [<LoadAddr>] [<ExecAddr>]',[ExeName]);
+  WriteLnFmt('%s <operation> <DFSImage> [<params>]',[ExeName]);
+  WriteLn;
+  WriteLn('Where operations are one of :');
+  WriteLn('cat      : catalog disk image, including file info');
+  WriteLn('create   : create a new disk image with specified no of tracks');
+  WriteLn('read     : read the specified DFS filename, and output to native file');
+  WriteLn('write    : write a native file to the DFS image');
+  WriteLn('dump     : dump a DFS file in hex and ASCII');
+  WriteLn;
+  WriteLn('The following optional parameters may be specified : ');
+  WriteLn(' -c, --count=     : Over-ride catalog filecount (for cat / read / dump).');
+  WriteLn(' -d, --dfs=       : Specify DFS filename to read / write.');
+  WriteLn(' -e, --exec=      : Specify Execution address when writing.');
+  WriteLn(' -f, --file=      : Specify native file to read / write.');
+  WriteLn(' -h, --help       : Display this help.');
+  WriteLn(' -l, --load=      : Specify load address when writing.');
+  WriteLn(' -L, --label=     : Set disk label when creating.');
+  WriteLn(' -o, --opt=       : Set disk opt when creating.');
+  WriteLn(' -q, --qual=      : Specify qualifier, defaults to ''$''.');
+  WriteLn(' -t, --tracks=    : Specify max tracks when creating (40 or 80).');
 end;
 
 var

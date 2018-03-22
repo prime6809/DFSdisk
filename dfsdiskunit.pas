@@ -133,7 +133,7 @@ BEGIN;
   DiskMem:=TMemoryStream.Create;
   FMaxTracks:=40;
   FWritePos:=-1;
-  FFileCount:=-1;
+  FFileCount:=0;
 END;
 
 DESTRUCTOR TDFSDiskImage.Destroy;
