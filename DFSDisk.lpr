@@ -105,17 +105,6 @@ CONST
                            OptSQual+    ':'+
                            OptSTracks+  ':';
 
-(*    LongOpts    : string = OptLFCount+  ': '+
-                           OptLDFSName+ ': '+
-                           OptLExec+    ': '+
-                           OptLFile+    ': '+
-                           OptLHelp+    ' '+
-                           OptLLoad+    ': '+
-                           OptLLabel+   ': '+
-                           OptLOpt+     ': '+
-                           OptLQual+    ': '+
-                           OptLTracks+  ': ';
-*)
     LongOptsArray : array[1..10] of string =
                                       (OptLFCount+':',
                                        OptLDFSName+':',
