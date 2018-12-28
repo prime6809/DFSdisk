@@ -60,6 +60,7 @@ FUNCTION GetDFSName(Name    : STRING) : STRING;
 BEGIN;
   Result:=TruncateAndPad(ChangeFileExt(Name,''),7,' ');
 END;
+
 {Add a binary constant to a BCD constant, and return as BCD, overflow ignored!}
 FUNCTION AddBCD(BCDNum    : BYTE;
                 ToAdd     : BYTE) : BYTE;

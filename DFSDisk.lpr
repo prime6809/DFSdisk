@@ -6,7 +6,8 @@ uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}
   cthreads,
   {$ENDIF}{$ENDIF}
-  Classes, SysUtils, CustApp, ConsoleUtils, DFSDiskUnit, DFSUtilUnit
+  Classes, SysUtils, CustApp, ConsoleUtils, DFSDiskUnit, DFSUtilUnit,
+  AtmFileUnit
   { you can add units after this };
 
 type
@@ -18,7 +19,9 @@ type
     DFSRead,
     DFSWrite,
     DFSCat,
-    DFSDump
+    DFSDump,
+    DFSDelete,
+    ATMCreate
   );
 
   { TDFSDisk }
@@ -37,10 +40,12 @@ type
     DFSLabel        : STRING;
     DFSOption       : BYTE;
     DFSCount        : BYTE;
+    AtomBasic       : BOOLEAN;
 
     OpCode          : TOpCodes;
 
     Disk            : TDFSDiskImage;
+    AtmFile         : TAtmFile;
 
     procedure DoRun; override;
     PROCEDURE DoHelp;
@@ -62,6 +67,10 @@ type
     PROCEDURE DoWrite;
     PROCEDURE DoCat;
     PROCEDURE DoDump;
+    PROCEDURE DoDelete;
+    PROCEDURE DoCreateAtm;
+    PROCEDURE BasicAcornToNative(VAR Buffer : TMemoryStream);
+
   public
     constructor Create(TheOwner: TComponent); override;
     destructor Destroy; override;
@@ -80,6 +89,7 @@ CONST
     OptSOpt     = 'o';          // Set disk opt when creating
     OptSQual    = 'q';          // Specify qualifier, defaults to '$'
     OptSTracks  = 't';          // Specify max tracks when writing (40 or 80).
+    OptSAtomBas = 'A';          // DFS file is Atom basic, convert to ASCII when reading
 
     {Long form options}
     OptLFCount  = 'count';
@@ -92,6 +102,7 @@ CONST
     OptLOpt     = 'opt';
     OptLQual    = 'qual';
     OptLTracks  = 'tracks';
+    OptLAtomBas = 'abasic';
 
     {Short and long opts as strings for use in CheckOpts}
     ShortOpts   : string = OptSFCount+  ':'+
@@ -103,9 +114,10 @@ CONST
                            OptSLabel+   ':'+
                            OptSOpt+     ':'+
                            OptSQual+    ':'+
-                           OptSTracks+  ':';
+                           OptSTracks+  ':'+
+                           OptSAtomBas+ '::';
 
-    LongOptsArray : array[1..10] of string =
+    LongOptsArray : array[1..11] of string =
                                       (OptLFCount+':',
                                        OptLDFSName+':',
                                        OptLExec+':',
@@ -115,19 +127,21 @@ CONST
                                        OptLLabel+':',
                                        OptLOpt+':',
                                        OptLQual+':',
-                                       OptLTracks+':');
+                                       OptLTracks+':',
+                                       OptLAtomBas);
 
     {Valid operations}
-    CmdCreate   = 'create';                     // Create a new disk image
-    CmdRead     = 'read';                       // Transfer DFS file to host
-    CmdWrite    = 'write';                      // Transfer host file to DFS
-    CmdCat      = 'cat';                        // Catalog the disk
-    CmdDump     = 'dump';                       // Dump the file in hex
-
-    NoCmds      = 5;
+    CmdCreateAtm    = 'createatm';              // Create an ATM file instead of DFS disk
+    CmdCreate       = 'create';                 // Create a new disk image
+    CmdRead         = 'read';                   // Transfer DFS file to host
+    CmdWrite        = 'write';                  // Transfer host file to DFS
+    CmdCat          = 'cat';                    // Catalog the disk
+    CmdDump         = 'dump';                   // Dump the file in hex
+    CmdDelete       = 'delete';                 // Delete an image file
+    NoCmds          = 7;
 
     {Note these must be in the same order as opcodes, defined above}
-    Commands    : ARRAY [1..NoCmds] OF STRING = (CmdCreate, CmdRead, CmdWrite, CmdCat, CmdDump);
+    Commands    : ARRAY [1..NoCmds] OF STRING = (CmdCreate, CmdRead, CmdWrite, CmdCat, CmdDump, CmdDelete, CmdCreateAtm);
 
     {Default number of tracks when creating an image}
     DefTracks   = 40;
@@ -150,9 +164,55 @@ BEGIN;
   WriteLnFmt('Created image file %s, title %s, qual %s, opt %d, tracks=%d',[DFSImageName,DFSLabel,DFSQual,DFSOption,DFSTracks]);
 END;
 
+PROCEDURE TDFSDisk.BasicAcornToNative(VAR Buffer : TMemoryStream);
+
+VAR OutputList  : TStringList;
+    Line        : STRING;
+    InByte      : BYTE;
+    LineNo      : WORD;
+    MSB,LSB     : BYTE;
+
+BEGIN;
+  OutputList:=TStringList.Create;
+  TRY
+    Line:='';
+    LineNo:=0;
+    Buffer.Seek(0,soFromBeginning);
+
+    WHILE (Buffer.Position < Buffer.Size) DO
+    BEGIN;
+      Buffer.Read(InByte,sizeof(InByte));
+      IF (InByte=$0D) THEN
+      BEGIN;
+        // EOL,  add previous line to output
+        OutputList.Add(Line);
+        Line:='';
+
+        // Read linenumber
+        Buffer.Read(MSB,sizeof(MSB));
+        Buffer.Read(LSB,sizeof(LSB));
+        LineNo:=(MSB*256)+LSB;
+        Line:=Format('%d ',[LineNo]);
+      END
+      ELSE
+        Line:=Line+CHR(InByte);
+    END;
+    IF (Length(Line) > 0) THEN
+      OutputList.Add(Line);
+
+    Buffer.SetSize(0);
+    OutputList.SaveToStream(Buffer);
+  FINALLY
+    OutputList.Free;
+  END;
+END;
+
 PROCEDURE TDFSDisk.DoRead;
 
 VAR OutStream   : TFileStream;
+    BuffStream  : TMemoryStream;
+    BuffByte    : BYTE;
+    LastByte    : BYTE;
 
 BEGIN;
   {check filename given, error if not}
@@ -165,11 +225,19 @@ BEGIN;
 
   {Create output file, and read DFS disk file into it}
   OutStream:=TFileStream.Create(IOFileName, fmCreate + fmOpenWrite);
+  BuffStream:=TMemoryStream.Create;
   TRY
-    Disk.ReadToStream(DFSFileName,DFSQual,OutStream);
+    Disk.ReadToStream(DFSFileName,DFSQual,BuffStream);
+    BuffStream.Seek(0,soFromBeginning);
+    IF (AtomBasic) THEN
+      BasicAcornToNative(BuffStream);
+
+    BuffStream.Seek(0,soFromBeginning);
+    OutStream.CopyFrom(BuffStream,BuffStream.Size);
     WriteLnFmt('Read DFS:%s to %s from image %s',[DFSFileName,IOFileName,DFSImageName]);
   FINALLY
     OutStream.Free;
+    BuffStream.Free;
   END;
 END;
 
@@ -223,9 +291,9 @@ VAR FileNo      : BYTE;
 
 BEGIN;
   {itterate through files on disk printing their details}
-  FOR FileNo:=0 TO (Disk.NoFiles-1) DO
+  FOR FileNo:=1 TO (Disk.NoFiles) DO
   BEGIN
-    Disk.GetCatEntry(FileNo,FileName,Info);
+    Disk.GetCatEntry(FileNo-1,FileName,Info);
     WriteLnFmt('%s.%s %4.4X %4.4X %5.5X %3.3X',[
                             FileName.DirPrefix,Copy(FileName.Name,0,7),
                             Info.LoadAddr,Info.ExecAddr,GetFileSize(Info),
@@ -259,6 +327,33 @@ BEGIN;
   END;
 END;
 
+PROCEDURE TDFSDisk.DoDelete;
+
+BEGIN;
+  {If DFS filename not given default to input filename, mangled to be DFS valid}
+  IF (DFSFileName='') THEN
+    Raise Exception.Create('Error: you must specify the DFS filename to delete');
+
+  {Check that file exists, error if not}
+  IF (Disk.FindFileNo(DFSFileName,DFSQual) = InvalidFileNo) THEN
+    Raise Exception.CreateFmt('Error: file %s.%s does not exist on disk image %s',[DFSQual,DFSFileName,DFSImageName]);
+
+  IF (Disk.DeleteFile(DFSFileName,DFSQual)) THEN
+  BEGIN;
+    WriteLnFmt('Saving to %s',[DFSImageName]);
+    Disk.SaveToFile(DFSImageName);
+  END;
+END;
+
+PROCEDURE TDFSDisk.DoCreateAtm;
+
+BEGIN;
+  AtmFile.LoadAddr:=DFSLoad;
+  AtmFile.ExecAddr:=DFSExec;
+  AtmFile.FileName:=GetDFSName(ExtractFileName(IOFileName));
+  AtmFile.CopyFromFile(IOFileName,DFSImageName);
+END;
+
 FUNCTION TDFSDisk.DecodeCommand : BOOLEAN;
 
 VAR Idx : INTEGER;
@@ -274,7 +369,7 @@ END;
 PROCEDURE TDFSDisk.DoProcess;
 
 BEGIN;
-  IF (OpCode<>DFSCreate) THEN
+  IF (NOT (OpCode IN [DFSCreate,ATMCreate])) THEN
     Disk.LoadFromFile(DFSImageName);
 
   CASE OpCode OF
@@ -283,6 +378,8 @@ BEGIN;
     DFSWrite    : DoWrite;
     DFSCat      : DoCat;
     DFSDump     : DoDump;
+    DFSDelete   : DoDelete;
+    ATMCreate   : DoCreateAtm;
   END;
 END;
 
@@ -330,7 +427,6 @@ begin
   if HasOption(OptSHelp, OptLHelp) then
   begin;
     DoHelp;
-//    Terminate;
     Exit;
   end;
 
@@ -393,6 +489,10 @@ begin
   IF (HasOption(OptSFCount, OptLFCount)) THEN
     Disk.NoFiles:=GetNumRange(OptSFCount, OptLFCount, MaxFileNo, 0,MaxFileNo);
 
+  {Atom basic flag}
+  IF (HasOption(OptSAtomBas, OptLAtomBas)) THEN
+    AtomBasic:=TRUE;
+
   IF (NOT DecodeCommand) THEN
     ErrorMsg:=ErrorMsg+Format('%s : Invalid command!',[OpStr]);
 
@@ -417,6 +517,7 @@ end;
 
 {Setup defaults}
 constructor TDFSDisk.Create(TheOwner: TComponent);
+
 begin
   inherited Create(TheOwner);
   StopOnException:=True;
@@ -431,26 +532,32 @@ begin
   DFSTracks:=DefTracks;
   CmdParams:=TStringList.Create;
   Disk:=TDFSDiskImage.Create;
+  AtmFile:=TAtmFile.Create;
+  AtomBasic:=FALSE;
 end;
 
 destructor TDFSDisk.Destroy;
 begin
   CmdParams.Free;
   Disk.Free;
+  AtmFile.Free;
   inherited Destroy;
 end;
 
 procedure TDFSDisk.WriteHelp;
 begin
   { add your help code here }
-  WriteLnFmt('%s <operation> <DFSImage> [<params>]',[ExeName]);
+  WriteLnFmt('%s <operation> <DFSImage|ATMFile> [<params>]',[ExeName]);
   WriteLn;
   WriteLn('Where operations are one of :');
-  WriteLn('cat      : catalog disk image, including file info');
-  WriteLn('create   : create a new disk image with specified no of tracks');
-  WriteLn('read     : read the specified DFS filename, and output to native file');
-  WriteLn('write    : write a native file to the DFS image');
-  WriteLn('dump     : dump a DFS file in hex and ASCII');
+  WriteLn('cat       : catalog disk image, including file info');
+  WriteLn('create    : create a new disk image with specified no of tracks');
+  WriteLn('read      : read the specified DFS filename, and output to native file');
+  WriteLn('write     : write a native file to the DFS image');
+  WriteLn('dump      : dump a DFS file in hex and ASCII');
+  WriteLn('delete    : delete a DFS file');
+  WriteLn('createatm : create an AtoMMC .ATM file from raw binary');
+
   WriteLn;
   WriteLn('The following optional parameters may be specified : ');
   WriteLn(' -c, --count=     : Over-ride catalog filecount (for cat / read / dump).');

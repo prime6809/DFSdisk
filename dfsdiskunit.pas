@@ -31,6 +31,8 @@ CONST
         DFSBlockPerTrack    = 10;   // 10 sectors / track
         DFSOneTrack         = DFSBlockPerTrack * DFSBlockSize;
 
+        CATEntryLen         = 8;    // Length of each catalog entry (or filename + qual)
+
         InfFileExt		= '.inf';
         LockedStr		= 'Locked';
 
@@ -66,7 +68,7 @@ TYPE
     TDFSCatalogInfo = PACKED RECORD
       DiskName      : ARRAY[0..3]OF CHAR;   // Disk name last 4 chars
       CycleCount    : BYTE;                 // Disk cycle count (BBC DFS), extra title byte System / Atom
-      NumEntries    : BYTE;                 // Num catalog entries * 8
+      NumEntries    : BYTE;                 // Num catalog entries * CATEntryLen (8)
       OptionBits    : BYTE;                 // Disk options + MS 2 bits of Total sectors.
       TotalSecLSB   : BYTE;                 // LSB of total sectors on disk
       FileInfo      : ARRAY[0..MaxFileNo]OF TDFSFileInfo;   // File information recrds
@@ -117,7 +119,8 @@ TYPE
                          Qual           : CHAR;
                          DiskLabel      : STRING;
                          Option         : BYTE) : BOOLEAN;
-
+    FUNCTION DeleteFile(FileName        : STRING;
+                        Qual            : CHAR) : BOOLEAN;
   END;
 
 
@@ -207,7 +210,7 @@ BEGIN
   IF (FFileCount IN [0..MaxFileNo]) THEN
     Result:=FFileCount
   ELSE
-    Result:=CatInfo.NumEntries DIV 8;
+    Result:=CatInfo.NumEntries DIV CATEntryLen;
 END;
 
 PROCEDURE TDFSDiskImage.SetNoFiles(NoFiles    : BYTE);
@@ -339,7 +342,7 @@ BEGIN;
                              ((FileLen  AND $30000) SHR 12) +
                              ((LoadAddr AND $30000) SHR 14) +
                              ((StartSec AND $300)   SHR 8);
-    NumEntries:=NumEntries+8;
+    NumEntries:=NumEntries+CATEntryLen;
     CycleCount:=AddBCD(CycleCount,1);
   END;
 END;
@@ -426,6 +429,42 @@ BEGIN;
   Result:=TRUE;
 END;
 
+FUNCTION TDFSDiskImage.DeleteFile(FileName        : STRING;
+                                  Qual            : CHAR) : BOOLEAN;
+
+VAR FileNo  : BYTE;
+    EntryNo : INTEGER;
+
+BEGIN;
+  Result:=FALSE;    {assume we will fail!}
+
+  FileNo:=FindFileNo(FileName,Qual);
+
+  { If file found then delete it! }
+  IF (FileNo <> InvalidFileNo) THEN
+  BEGIN;
+    {Move all catalog entries after file to be deleted up one}
+    FOR EntryNo:=FileNo TO MaxFileNo DO
+    BEGIN
+      Catalog.Entries[EntryNo]:=Catalog.Entries[EntryNo+1];
+      CatInfo.FileInfo[EntryNo]:=CatInfo.FileInfo[EntryNo+1];
+    END;
+    { Always blank the last entry, just incase disk had max files }
+    FillChar(Catalog.Entries[MaxFileNo],Sizeof(Catalog.Entries[MaxFileNo]),0);
+    FillChar(CatInfo.FileInfo[MaxFileNo],Sizeof(CatInfo.FileInfo[MaxFileNo]),0);
+
+    {Decrement filecount}
+    CatInfo.NumEntries:=CatInfo.NumEntries - CATEntryLen;
+
+    {Rewrite catalog data}
+    DiskMem.Seek(0,soFromBeginning);
+    DiskMem.Write(Catalog,SizeOf(Catalog));
+    DiskMem.Write(CatInfo,SizeOf(CatInfo));
+
+    {Flag file deleted}
+    Result:=TRUE;
+  END;
+END;
 
 end.
 

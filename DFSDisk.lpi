@@ -25,10 +25,15 @@
     <RunParams>
       <local>
         <FormatVersion Value="1"/>
-        <CommandLineParams Value="create test.ssd --tracks=80"/>
+        <CommandLineParams Value="delete test01.ssd -d INFALL -q $20"/>
       </local>
     </RunParams>
-    <Units Count="4">
+    <RequiredPackages Count="1">
+      <Item1>
+        <PackageName Value="LCL"/>
+      </Item1>
+    </RequiredPackages>
+    <Units Count="5">
       <Unit0>
         <Filename Value="DFSDisk.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -47,6 +52,10 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DFSUtilUnit"/>
       </Unit3>
+      <Unit4>
+        <Filename Value="AtmFileUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit4>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
