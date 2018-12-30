@@ -90,6 +90,7 @@ CONST
     OptSQual    = 'q';          // Specify qualifier, defaults to '$'
     OptSTracks  = 't';          // Specify max tracks when writing (40 or 80).
     OptSAtomBas = 'A';          // DFS file is Atom basic, convert to ASCII when reading
+    OptSAtom    = 'a';          // Disk is System / Atom disk, qual defaults to space
 
     {Long form options}
     OptLFCount  = 'count';
@@ -103,6 +104,7 @@ CONST
     OptLQual    = 'qual';
     OptLTracks  = 'tracks';
     OptLAtomBas = 'abasic';
+    OptLAtom    = 'atom';
 
     {Short and long opts as strings for use in CheckOpts}
     ShortOpts   : string = OptSFCount+  ':'+
@@ -115,9 +117,10 @@ CONST
                            OptSOpt+     ':'+
                            OptSQual+    ':'+
                            OptSTracks+  ':'+
-                           OptSAtomBas+ '::';
+                           OptSAtomBas+ '::'+
+                           OptSAtom+    '::';
 
-    LongOptsArray : array[1..11] of string =
+    LongOptsArray : array[1..12] of string =
                                       (OptLFCount+':',
                                        OptLDFSName+':',
                                        OptLExec+':',
@@ -128,7 +131,8 @@ CONST
                                        OptLOpt+':',
                                        OptLQual+':',
                                        OptLTracks+':',
-                                       OptLAtomBas);
+                                       OptLAtomBas,
+                                       OptLAtom);
 
     {Valid operations}
     CmdCreateAtm    = 'createatm';              // Create an ATM file instead of DFS disk
@@ -460,6 +464,9 @@ begin
   IF (HasOption(OptSExec, OptLExec)) THEN
     DFSExec:=StrToIntDef(GetOptionValue(OptSExec, OptLExec),$0000);
 
+  IF (HasOption(OptSAtom, OptLAtom)) THEN
+    DFSQual:=' ';
+
   {DFS Qualifier}
   IF (HasOption(OptSQual, OptLQual)) THEN
   BEGIN;
@@ -570,6 +577,8 @@ begin
   WriteLn(' -o, --opt=       : Set disk opt when creating.');
   WriteLn(' -q, --qual=      : Specify qualifier, defaults to ''$''.');
   WriteLn(' -t, --tracks=    : Specify max tracks when creating (40 or 80).');
+  WriteLn(' -a, --atom       : Disk is Atom/System disk, use space as a qualifier.');
+  WriteLn(' -A, --abasic     : DFS file is Atom basic, convert to ASCII when reading.');
 end;
 
 var
