@@ -36,6 +36,7 @@ TYPE
     Destructor Destroy; override;
     PROCEDURE CopyFromFile(CopyFrom : STRING;
                            CopyTo   : STRING);
+    PROCEDURE ReadFromStream(InStream  : TStream);
     PROCEDURE ReadFromFile(InFileName : STRING);
     PROCEDURE WriteToFile(OutFileName : STRING);
   END;
@@ -90,7 +91,6 @@ PROCEDURE TAtmFile.CopyFromFile(CopyFrom    : STRING;
 
 VAR AtmBuff : TMemoryStream;
     InFile  : TFileStream;
-    Idx     : INTEGER;
 
 BEGIN;
   AtmBuff:=TMemoryStream.Create;
@@ -121,6 +121,15 @@ BEGIN;
   END;
 END;
 
+{Assumes stream is positioned at the beginning of the header data}
+PROCEDURE TAtmFile.ReadFromStream(InStream  : TStream);
+
+BEGIN;
+  InStream.Read(Header,SizeOf(Header));
+  FileData.Seek(0,soFromBeginning);
+  FileData.CopyFrom(InStream,Header.Length);
+END;
+
 PROCEDURE TAtmFile.ReadFromFile(InFileName : STRING);
 
 VAR FileBuf : TMemoryStream;
@@ -132,10 +141,11 @@ BEGIN;
     BEGIN;
       FileBuf.LoadFromFile(InFileName);
       FileBuf.Seek(0,soFromBeginning);
-      FileBuf.Read(Header,Sizeof(Header));
+      ReadFromStream(FileBuf);
+{      FileBuf.Read(Header,Sizeof(Header));
       FileData.Seek(0,soFromBeginning);
       FileData.CopyFrom(FileBuf,Header.Length);
-    END;
+}    END;
   FINALLY
     FileBuf.Free;
   END;

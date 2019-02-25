@@ -100,6 +100,7 @@ CONST
     OptSTracks  = 't';          // Specify max tracks when writing (40 or 80).
     OptSAtomBas = 'A';          // DFS file is Atom basic, convert to ASCII when reading
     OptSAtom    = 'a';          // Disk is System / Atom disk, qual defaults to space
+    OptSUpper   = 'U';          // Upper case convert DFS filename before writing
 
     {Long form options}
     OptLFCount  = 'count';
@@ -115,6 +116,7 @@ CONST
     OptLTracks  = 'tracks';
     OptLAtomBas = 'abasic';
     OptLAtom    = 'atom';
+    OptLUpper   = 'upper';
 
     {Short and long opts as strings for use in CheckOpts}
     ShortOpts   : string = OptSFCount+  ':'+
@@ -129,9 +131,10 @@ CONST
                            OptSQual+    ':'+
                            OptSTracks+  ':'+
                            OptSAtomBas+ '::'+
-                           OptSAtom+    '::';
+                           OptSAtom+    '::'+
+                           OptSUpper+   '::';
 
-    LongOptsArray : array[1..13] of string =
+    LongOptsArray : array[1..14] of string =
                                       (OptLFCount+':',
                                        OptLDFSName+':',
                                        OptLExec+':',
@@ -144,7 +147,8 @@ CONST
                                        OptLQual+':',
                                        OptLTracks+':',
                                        OptLAtomBas,
-                                       OptLAtom);
+                                       OptLAtom,
+                                       OptLUpper);
 
     {Valid operations}
     CmdCreateAtm    = 'createatm';              // Create an ATM file instead of DFS disk
@@ -227,8 +231,6 @@ PROCEDURE TDFSDisk.DoRead;
 
 VAR OutStream   : TFileStream;
     BuffStream  : TMemoryStream;
-    BuffByte    : BYTE;
-    LastByte    : BYTE;
 
 BEGIN;
   {check filename given, error if not}
@@ -260,7 +262,7 @@ END;
 PROCEDURE TDFSDisk.DoWrite;
 
 VAR InStream    : TFileStream;
-    FileNo      : BYTE;
+    WriteOK     : BOOLEAN;
 
 BEGIN;
   {Check for valid input filename}
@@ -269,7 +271,13 @@ BEGIN;
 
   {If DFS filename not given default to input filename, mangled to be DFS valid}
   IF (DFSFileName='') THEN
-    DFSFileName:=GetDFSName(ExtractFileName(IOFileName));
+    DFSFileName:=ExtractFileName(IOFileName);
+
+  {If upper case flag specified, convert DFS name to upper case }
+  IF (HasOption(OptSUpper, OptLUpper)) THEN
+    DFSFileName:=GetDFSName(UpperCase(DFSFileName))
+  ELSE
+    DFSFileName:=GetDFSName(DFSFileName);
 
   {Check that file does not already exist, error if so}
   IF (Disk.FindFileNo(DFSFileName,DFSQual) < MaxFileNo) THEN
@@ -287,7 +295,12 @@ BEGIN;
       Raise Exception.Create('Error: not enough free space on disk');
 
     {Write the input file to the DFS disk }
-    IF (Disk.WriteFromStream(DFSFileName,DFSQual,DFSLoad,DFSExec,InStream)) THEN
+    IF (IOFileType = FTAtm) THEN
+      WriteOK:=Disk.WriteFromATM(DFSFileName,DFSQual,InStream)
+    ELSE
+      WriteOK:=Disk.WriteFromStream(DFSFileName,DFSQual,DFSLoad,DFSExec,InStream);
+
+    IF (WriteOK) THEN
     BEGIN;
       WriteLnFmt('Saving to %s',[DFSImageName]);
       Disk.SaveToFile(DFSImageName);
@@ -603,6 +616,7 @@ begin
   WriteLn(' -t, --tracks=    : Specify max tracks when creating (40 or 80).');
   WriteLn(' -a, --atom       : Disk is Atom/System disk, use space as a qualifier.');
   WriteLn(' -A, --abasic     : DFS file is Atom basic, convert to ASCII when reading.');
+  WriteLN(' -U, --upper      : Uppercase DFS filename before writing');
 end;
 
 var

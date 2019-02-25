@@ -5,7 +5,7 @@ unit DFSDiskUnit;
 interface
 
 uses
-  Classes, SysUtils, ConsoleUtils;
+  Classes, SysUtils, ConsoleUtils, ATMFileUnit;
 
 CONST
         { Masks/Shifts within TDFSFileInfo.ExtraBits }
@@ -115,6 +115,9 @@ TYPE
                              LoadAddr   : LONGWORD;
                              ExecAddr   : LONGWORD;
                              StreamIn   : TStream) : BOOLEAN;
+    FUNCTION WriteFromATM(FileName   : STRING;
+                          Qual       : CHAR;
+                          StreamIn   : TStream) : BOOLEAN;
     FUNCTION CreateImage(DiskTracks     : WORD;
                          Qual           : CHAR;
                          DiskLabel      : STRING;
@@ -380,6 +383,22 @@ BEGIN
     DiskMem.Write(Catalog,SizeOf(Catalog));
     DiskMem.Write(CatInfo,SizeOf(CatInfo));
     Result:=TRUE;
+  END;
+END;
+{Write from ATM format file}
+FUNCTION TDFSDiskImage.WriteFromATM(FileName   : STRING;
+                                    Qual       : CHAR;
+                                    StreamIn   : TStream) : BOOLEAN;
+
+VAR ATMFile : TAtmFile;
+
+BEGIN;
+  TRY
+    ATMFile:=TAtmFile.Create;
+    ATMFile.ReadFromStream(StreamIn);
+    Result:=WriteFromStream(FileName,Qual,ATMFile.LoadAddr,ATMFile.ExecAddr,ATMFile.FileData);
+  FINALLY
+    ATMFile.Free;
   END;
 END;
 
