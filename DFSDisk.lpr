@@ -24,6 +24,12 @@ type
     ATMCreate
   );
 
+  {Input / Output file types, currently just RAW and ATM}
+  TFileTypes = (
+    FTRaw = 0,      // RAW binary, the default.
+    FTAtm
+  );
+
   { TDFSDisk }
 
   TDFSDisk = class(TCustomApplication)
@@ -43,6 +49,8 @@ type
     AtomBasic       : BOOLEAN;
 
     OpCode          : TOpCodes;
+
+    IOFileType      : TFileTypes;
 
     Disk            : TDFSDiskImage;
     AtmFile         : TAtmFile;
@@ -83,6 +91,7 @@ CONST
     OptSDFSName = 'd';          // Specify DFS filename to read / write
     OptSExec    = 'e';          // Specify Execution address when writing
     OptSFile    = 'f';          // Specify host file to read / write
+    OptSATM     = 'T';          // Specify .ATM format file to read or write.
     OptSHelp    = 'h';          // Get some help
     OptSLoad    = 'l';          // Specify load address when writing
     OptSLabel   = 'L';          // Set disk label when creating
@@ -97,6 +106,7 @@ CONST
     OptLDFSName = 'dfs';
     OptLExec    = 'exec';
     OptLFile    = 'file';
+    OptLATM     = 'atm';
     OptLHelp    = 'help';
     OptLLoad    = 'load';
     OptLLabel   = 'label';
@@ -111,6 +121,7 @@ CONST
                            OptSDFSName+ ':'+
                            OptSExec+    ':'+
                            OptSFile+    ':'+
+                           OptSATM+     ':'+
                            OptSHelp+    '::'+
                            OptSLoad+    ':'+
                            OptSLabel+   ':'+
@@ -120,11 +131,12 @@ CONST
                            OptSAtomBas+ '::'+
                            OptSAtom+    '::';
 
-    LongOptsArray : array[1..12] of string =
+    LongOptsArray : array[1..13] of string =
                                       (OptLFCount+':',
                                        OptLDFSName+':',
                                        OptLExec+':',
                                        OptLFile+':',
+                                       OptLATM+':',
                                        OptLHelp,
                                        OptLLoad+':',
                                        OptLLabel+':',
@@ -454,7 +466,17 @@ begin
 
   {Input or output filename}
   IF (HasOption(OptSFile, OptLFile)) THEN
+  BEGIN;
     IOFileName:=GetOptionValue(OptSFile, OptLFile);
+    IOFileType:=FTRaw;
+  END;
+
+  {Input or output is ATM file ?}
+  IF (HasOption(OptSATM, OptLATM)) THEN
+  BEGIN;
+    IOFileName:=GetOptionValue(OptSATM, OptLATM);
+    IOFileType:=FTAtm;
+  END;
 
   {DFS Load address}
   IF (HasOption(OptSLoad, OptLLoad)) THEN
@@ -536,6 +558,7 @@ begin
   DFSExec:=$0000;
   DFSQual:='$';
   IOFileName:='';
+  IOFileType:=FTRaw;
   DFSTracks:=DefTracks;
   CmdParams:=TStringList.Create;
   Disk:=TDFSDiskImage.Create;
@@ -571,6 +594,7 @@ begin
   WriteLn(' -d, --dfs=       : Specify DFS filename to read / write.');
   WriteLn(' -e, --exec=      : Specify Execution address when writing.');
   WriteLn(' -f, --file=      : Specify native file to read / write.');
+  WriteLn(' -T, --atm=       : Specify ATM file to read or write.');
   WriteLn(' -h, --help       : Display this help.');
   WriteLn(' -l, --load=      : Specify load address when writing.');
   WriteLn(' -L, --label=     : Set disk label when creating.');

@@ -18,18 +18,26 @@ TYPE
   END;
 
   TAtmFile   = class(TObject)
-  private
+  protected
     Header      : TAtmHead;
+
+    FUNCTION GetFileName : STRING;
+    PROCEDURE SetFileName(NewName   : STRING);
   public
-    FileName    : STRING;
-    LoadAddr    : WORD;
-    ExecAddr    : WORD;
     Errors      : STRING;
+    FileData    : TMemoryStream;
+
+    PROPERTY FileName   : STRING READ GetFileName WRITE SetFileName;
+    PROPERTY LoadAddr   : WORD READ Header.LoadAddr WRITE Header.LoadAddr;
+    PROPERTY ExecAddr   : WORD READ Header.ExecAddr WRITE Header.ExecAddr;
+    PROPERTY DataLength : WORD READ Header.Length WRITE Header.Length;
 
     Constructor Create;
     Destructor Destroy; override;
     PROCEDURE CopyFromFile(CopyFrom : STRING;
                            CopyTo   : STRING);
+    PROCEDURE ReadFromFile(InFileName : STRING);
+    PROCEDURE WriteToFile(OutFileName : STRING);
   END;
 
 IMPLEMENTATION
@@ -41,13 +49,40 @@ BEGIN;
   FileName:='';
   LoadAddr:=$2800;
   ExecAddr:=$2800;
+  FileData:=TMemoryStream.Create;
   INHERITED Create;
 END;
 
 Destructor TAtmFile.Destroy;
 
 BEGIN;
+  FileData.Free;
   INHERITED Destroy;
+END;
+
+FUNCTION TAtmFile.GetFileName : STRING;
+
+BEGIN;
+  Result:=Header.FileName;
+END;
+
+PROCEDURE TAtmFile.SetFileName(NewName   : STRING);
+
+VAR MaxChar : INTEGER;
+    Idx     : INTEGER;
+
+BEGIN;
+  // Zero pad filaneme
+  FillChar(Header.FileName,ATMFileNameLen,0);
+
+  // Copy filename
+  IF (Length(NewName)<ATMFileNameLen) THEN
+    MaxChar:=Length(NewName)
+  ELSE
+    MaxChar:=ATMFileNameLen;
+
+  FOR Idx:=1 TO MaxChar DO
+    Header.FileName[Idx]:=NewName[Idx];
 END;
 
 PROCEDURE TAtmFile.CopyFromFile(CopyFrom    : STRING;
@@ -56,7 +91,6 @@ PROCEDURE TAtmFile.CopyFromFile(CopyFrom    : STRING;
 VAR AtmBuff : TMemoryStream;
     InFile  : TFileStream;
     Idx     : INTEGER;
-    MaxChar : INTEGER;
 
 BEGIN;
   AtmBuff:=TMemoryStream.Create;
@@ -75,18 +109,6 @@ BEGIN;
       Header.LoadAddr:=LoadAddr;
       Header.ExecAddr:=ExecAddr;
 
-      // Zero pad filaneme
-      FillChar(Header.FileName,ATMFileNameLen,0);
-
-      // Copy filename
-      IF (Length(FileName)<ATMFileNameLen) THEN
-        MaxChar:=Length(FileName)
-      ELSE
-        MaxChar:=ATMFileNameLen;
-
-      FOR Idx:=1 TO MaxChar DO
-        Header.FileName[Idx]:=FileName[Idx];
-
       AtmBuff.Write(Header, Sizeof(Header));
       AtmBuff.CopyFrom(InFile,Header.Length);
       AtmBuff.SaveToFile(CopyTo);
@@ -96,6 +118,42 @@ BEGIN;
   FINALLY
     AtmBuff.Free;
     InFile.Free;
+  END;
+END;
+
+PROCEDURE TAtmFile.ReadFromFile(InFileName : STRING);
+
+VAR FileBuf : TMemoryStream;
+
+BEGIN;
+  FileBuf:=TMemoryStream.Create;
+  TRY
+    IF (FileExists(InFileName)) THEN
+    BEGIN;
+      FileBuf.LoadFromFile(InFileName);
+      FileBuf.Seek(0,soFromBeginning);
+      FileBuf.Read(Header,Sizeof(Header));
+      FileData.Seek(0,soFromBeginning);
+      FileData.CopyFrom(FileBuf,Header.Length);
+    END;
+  FINALLY
+    FileBuf.Free;
+  END;
+END;
+
+PROCEDURE TAtmFile.WriteToFile(OutFileName : STRING);
+
+VAR FileBuf : TMemoryStream;
+
+BEGIN;
+  FileBuf:=TMemoryStream.Create;
+  TRY
+    FileBuf.Write(Header,SizeOf(Header));
+    FileData.Seek(0,soFromBeginning);
+    FileBuf.CopyFrom(FileData,Header.Length);
+    FileBuf.SaveToFile(OutFileName);
+  FINALLY
+    FileBuf.Free;
   END;
 END;
 
